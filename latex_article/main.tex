@@ -26,7 +26,7 @@
 \newcommand{\impact}{head-impact}
 
 \title{A Low-Cost Helmet-Integrated System for Measuring Head Impacts in American Football Players}
-\author{Juan Ram\'on Lara Mora \and Montserrat S\'anchez Ch\'avez \and Mariel Alfaro Ponce \and Gerardo Juli\'an Ram\'irez-Nava\\[0.5em]
+\author{Juan Ram\'on Lara Mora \and Diana Paola Ayala Rold\'an\thanks{Corresponding author: A01365809@tec.mx} \and Mariel Alfaro Ponce\\[0.5em]
 \small Tecnol\'ogico de Monterrey, Campus Ciudad de M\'exico, School of Engineering and Sciences}
 \date{}
 
@@ -255,6 +255,15 @@ Across four recorded pendulum sessions (each approximately \SI{10}{s} of continu
 \label{fig:acceltraces}
 \end{figure}
 
+Figure~\ref{fig:pendulum_theory} shows the theoretical pendulum acceleration waveforms for the calibration parameters ($L = \SI{13}{cm}$, $\theta_0 = \ang{60}$). The tangential acceleration peaks at $\pm\SI{8.5}{m/s^2}$ ($\approx \SI{0.87}{\gee}$) at the release angle, and the total acceleration at the bottom of the swing reaches approximately $\SI{19.6}{m/s^2}$ ($\approx \SI{2.0}{\gee}$). The theoretical oscillation frequency of \SI{1.38}{Hz} closely matches the \SI{1.4}{Hz} observed in both the instrumented and reference accelerometer traces, confirming the fidelity of the data-acquisition chain.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/pendulum_theoretical.png}
+\caption{Theoretical acceleration waveforms for a simple pendulum with $L = \SI{13}{cm}$ and $\theta_0 = \ang{60}$. Top: tangential acceleration (peaks at $\pm\SI{0.87}{\gee}$ at release). Bottom: total acceleration combining centripetal and gravitational components (peaks at $\approx \SI{2.0}{\gee}$ at the nadir).}
+\label{fig:pendulum_theory}
+\end{figure}
+
 \subsubsection{Load-cell mass-measurement accuracy}
 Table~\ref{tab:loadcell} summarizes the static mass-measurement tests. For each known mass, the load-cell system was sampled repeatedly (7--11 readings per condition); the table reports the mean, standard deviation (SD), and relative error of the mean with respect to the expected value. Across the four conditions (\SI{190}{}--\SI{4536}{g}), the overall mean absolute percentage error (MAPE) was \SI{0.33}{\percent}, with a coefficient of variation below \SI{0.3}{\percent} for every multi-sample condition. A least-squares linear fit of measured mean versus expected mass yielded
 \begin{equation}
@@ -279,6 +288,60 @@ Smartphone reference & 190 & 192.0 & --- & 1 & $+1.1$ \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+Figure~\ref{fig:calibration_curve} presents the calibration curve with 95\% confidence intervals and the regression line overlaid on the identity reference. The near-perfect overlap between the regression fit and the identity line visually confirms the negligible systematic bias across the full \SI{190}{}--\SI{4536}{g} range.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/calibration_curve.png}
+\caption{Load-cell calibration curve showing measured mean mass versus expected mass. Error bars represent 95\% confidence intervals. The regression line (red) nearly coincides with the identity line (dashed gray), confirming excellent static linearity ($R^2 > 0.9999$).}
+\label{fig:calibration_curve}
+\end{figure}
+
+The regression residuals (Figure~\ref{fig:residuals}) show that deviations from the linear fit remain within $\pm\SI{2}{g}$ for the calibration masses and reach $+\SI{1.2}{g}$ only for the single-point smartphone reference. No systematic trend is apparent, supporting the assumption of a linear sensor response.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/residuals.png}
+\caption{Regression residuals (measured $-$ predicted) for each mass condition. All residuals remain within $\pm\SI{2}{g}$, with no systematic pattern.}
+\label{fig:residuals}
+\end{figure}
+
+Figure~\ref{fig:distributions} shows the distribution of individual readings for each multi-sample condition. The box-and-strip plots reveal tight clustering around the expected value, with the coefficient of variation remaining below \SI{0.3}{\percent} in all conditions. The 10~lb condition exhibits the smallest relative spread (CV~$= \SI{0.06}{\percent}$), consistent with the load cell operating closer to the midrange of its \SI{50}{kg} capacity.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/distributions.png}
+\caption{Distribution of individual load-cell readings per mass condition. Box plots show the median (red line) and interquartile range; individual readings are overlaid as scatter points. Dashed red lines indicate the expected mass.}
+\label{fig:distributions}
+\end{figure}
+
+Temporal stability is shown in Figure~\ref{fig:time_series}, where consecutive readings are plotted against elapsed time within each acquisition sequence. The readings fluctuate within $\pm 1$~SD of the expected value, and no drift or monotonic trend is observed over the approximately \SI{0.5}{}--\SI{1.0}{s} acquisition windows, suggesting adequate short-term repeatability for a static calibration context.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/time_series.png}
+\caption{Consecutive load-cell readings over time for each mass condition. Shaded bands represent $\pm 1$~SD from the expected value. No temporal drift is observed within the acquisition windows.}
+\label{fig:time_series}
+\end{figure}
+
+Figure~\ref{fig:relative_errors} summarizes the relative error across all four conditions. The largest error ($+\SI{1.1}{\percent}$) occurs for the smartphone reference, where only a single reading was available and the \SI{190}{g} mass is near the low end of the load-cell range. For the three calibration-disk conditions, relative errors remain below $\pm\SI{0.2}{\percent}$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/relative_errors.png}
+\caption{Relative measurement error by mass condition. Positive values indicate overestimation; negative values indicate underestimation. The overall MAPE is \SI{0.33}{\percent}.}
+\label{fig:relative_errors}
+\end{figure}
+
+A Bland--Altman analysis (Figure~\ref{fig:bland_altman}) was performed to assess agreement between measured and expected values. The mean difference was $-\SI{0.82}{g}$ (negligible bias), with 95\% limits of agreement spanning $-\SI{6.2}{g}$ to $+\SI{4.6}{g}$. All four data points fall within the limits of agreement, and the scatter does not increase with measurement magnitude, indicating homoscedastic error behavior across the tested range.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/bland_altman.png}
+\caption{Bland--Altman plot of load-cell calibration data. The solid green line represents the mean difference ($-\SI{0.82}{g}$); dashed red lines represent $\pm 1.96$~SD limits of agreement. All points fall within the limits.}
+\label{fig:bland_altman}
+\end{figure}
 
 \subsubsection{Impact-region identification accuracy}
 When localized loads were applied to each of the four instrumented helmet regions, the system correctly identified the dominant impact region in approximately \SI{86}{\percent} of trials. The \SI{14}{\percent} misclassification rate was observed primarily when the applied load straddled the boundary between two adjacent sensor zones, causing near-equal responses in neighboring load-cell channels. This metric reflects the spatial discrimination capability of the four-sensor layout and is distinct from the mass-measurement accuracy reported above.
@@ -310,7 +373,7 @@ This prototype & Triaxial accelerometer + 4 load cells (helmet-integrated) & US\
 
 The cost comparison is notable. At approximately US\$96 in component cost, the prototype is roughly an order of magnitude cheaper than commercial helmet sensors reported at US\$1\,000--\$3\,000 \citep{king2017systematic}. Although the prototype does not yet match the functionality or validation level of those systems, the cost advantage may enable programs that currently have no impact monitoring to begin building data collection infrastructure. The recent open-source system by Ghazal and Ganpule \citep{ghazal2025opensource}, which includes both linear acceleration and angular velocity sensing at an even lower component cost, illustrates a growing ecosystem of accessible alternatives for under-resourced programs.
 
-The accelerometer calibration results (\SI{94}{\percent} agreement with a commercial reference, \SI{3.5}{\percent} MAPE relative to theory) provide reasonable confidence in the data acquisition chain's fidelity. However, the pendulum test spans only \SI{0}{}--\SI{2}{\gee}, which does not replicate the dynamics of football head impacts that commonly range from \SI{15}{\gee} to \SI{150}{\gee} and occur over durations of \SI{5}{}--\SI{30}{ms} \citep{guskiewicz2007measurement,pellman2003location,crisco2010frequency}. Prior validation studies of commercial systems have used linear impactors and instrumented headforms with reference accelerometer arrays to evaluate accuracy under realistic impact conditions \citep{jadischke2013accuracy,beckwith2020video,bartsch2017modified}. The load-cell subsystem demonstrated excellent static linearity ($R^2 > 0.9999$, MAPE $= \SI{0.33}{\percent}$, CV $< \SI{0.3}{\percent}$), though the \SI{86}{\percent} region-identification accuracy suggests that the four-sensor layout has boundary ambiguity that could be addressed by adding sensors or implementing a weighted centroid algorithm.
+The accelerometer calibration results (\SI{94}{\percent} agreement with a commercial reference, \SI{3.5}{\percent} MAPE relative to theory) provide reasonable confidence in the data acquisition chain's fidelity. The close match between the theoretical oscillation frequency (\SI{1.38}{Hz}) and the measured frequency ($\approx\SI{1.4}{Hz}$), illustrated in the pendulum simulation of Figure~\ref{fig:pendulum_theory}, further corroborates the absence of systematic timing or scaling errors in the acquisition pipeline. However, the pendulum test spans only \SI{0}{}--\SI{2}{\gee}, which does not replicate the dynamics of football head impacts that commonly range from \SI{15}{\gee} to \SI{150}{\gee} and occur over durations of \SI{5}{}--\SI{30}{ms} \citep{guskiewicz2007measurement,pellman2003location,crisco2010frequency}. Prior validation studies of commercial systems have used linear impactors and instrumented headforms with reference accelerometer arrays to evaluate accuracy under realistic impact conditions \citep{jadischke2013accuracy,beckwith2020video,bartsch2017modified}. The load-cell subsystem demonstrated excellent static linearity ($R^2 > 0.9999$, MAPE $= \SI{0.33}{\percent}$, CV $< \SI{0.3}{\percent}$), as confirmed by the near-unity slope and negligible intercept of the calibration curve (Figure~\ref{fig:calibration_curve}), the absence of systematic residual patterns (Figure~\ref{fig:residuals}), the tight per-condition distributions (Figure~\ref{fig:distributions}), stable temporal behavior (Figure~\ref{fig:time_series}), and homoscedastic agreement in the Bland--Altman analysis (Figure~\ref{fig:bland_altman}). Nevertheless, the \SI{86}{\percent} region-identification accuracy suggests that the four-sensor layout has boundary ambiguity that could be addressed by adding sensors or implementing a weighted centroid algorithm.
 
 \subsection{Limitations}
 The most important limitation is that the system was validated only in benchtop conditions. Sport-related concussion cannot be inferred from a single acceleration value, and linear acceleration alone omits rotational kinematics, impact duration, athlete-specific biomechanics, previous concussion history, and clinical symptoms. Recent research has established that rotational kinematics---particularly angular velocity and angular acceleration---are more closely associated with brain tissue deformation than linear acceleration alone \citep{cecchi2023rotational,rowson2013brain}. The current prototype therefore should be considered a screening adjunct. When an alert occurs, the appropriate clinical response is removal from play and evaluation by qualified medical personnel using a validated assessment pathway \citep{patricios2023consensus,echemendia2023scat6}.
@@ -334,13 +397,13 @@ This article presents a low-cost helmet-integrated prototype for measuring head 
 \section*{Declarations}
 
 \noindent\textbf{Author contributions (CRediT).}
-J.R.L.M.: Conceptualization, Hardware design, Software, Investigation, Writing---Original Draft. M.S.C.: Hardware design, Investigation, Data curation. M.A.P.: Supervision, Methodology, Writing---Review \& Editing. G.J.R.-N.: Supervision, Project administration, Writing---Review \& Editing.
+J.R.L.M.: Conceptualization, Hardware design, Software, Investigation, Writing---Original Draft. D.P.A.R.: Data curation, Formal analysis, Visualization, Writing---Review \& Editing. M.A.P.: Supervision, Methodology, Writing---Review \& Editing.
 
 \noindent\textbf{Ethics and consent.} The source project included an anonymous survey of coaching staff and an informed-consent process. Any future athlete-worn or health-data study must obtain institutional ethics approval before data collection.
 
 \noindent\textbf{Clinical disclaimer.} The prototype is a screening and research device only. It does not diagnose concussion and must not determine return-to-play status.
 
-\noindent\textbf{Data availability.} The calibration results reported in this article are derived from the values recorded during the original project. The Python acquisition code, CAD files, and hardware build instructions are available from the corresponding author upon reasonable request.
+\noindent\textbf{Data availability.} The raw calibration data, statistical analysis code, and a Jupyter notebook reproducing all figures and statistics are publicly available at \url{https://github.com/dianisay/helmet-impact-sensor}. The Python acquisition code, CAD files, and hardware build instructions are available from the corresponding author upon reasonable request.
 
 \noindent\textbf{Funding.} No external funding was received for this work.
 
