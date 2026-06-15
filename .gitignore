@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
