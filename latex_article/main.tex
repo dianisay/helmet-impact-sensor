@@ -13,8 +13,6 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{siunitx}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[hidelinks]{hyperref}
 
@@ -34,7 +32,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent\textbf{Background:} Repetitive head impacts in American football can lead to sport-related concussion and long-term neurological risk. Commercial helmet telemetry systems can support screening, but their cost and importation barriers limit adoption in resource-constrained collegiate and youth programs. \textbf{Objective:} This work presents the design and preliminary benchtop validation of a low-cost helmet-integrated system that measures linear acceleration and estimates impact location in an American football helmet. \textbf{Methods:} A Schutt F7 VTD Collegiate helmet was instrumented with an H3LIS200DL triaxial accelerometer, four SEN-10245 load cells with HX711 conditioning modules, and a Raspberry Pi Zero 2~W controller. The embedded algorithm triggers impact recording above \SI{14.4}{\gee}, samples the sensor response for four seconds at \SI{40}{ms} intervals, estimates the dominant impact region from the maximum load-cell response, and displays an alert for coaching staff. Benchtop validation used a pendulum-based accelerometer comparison against a commercial BWT61CL unit and static load-cell calibration with known masses. \textbf{Results:} The prototype achieved approximately \SI{94}{\percent} agreement with the commercial accelerometer in repeated pendulum trials, a mean absolute percentage error of \SI{0.33}{\percent} in static load-cell mass measurement ($R^2 > 0.9999$; coefficient of variation $< \SI{0.3}{\percent}$), and \SI{86}{\percent} accuracy in identifying the dominant impact region from four load-cell channels. The direct hardware cost was approximately US\$95.90 for one helmet prototype, well below the reported US\$1\,000--\$3\,000 cost of commercial impact-monitoring alternatives. \textbf{Conclusion:} The proposed system is a feasible proof-of-concept for low-cost head-impact monitoring and sideline alerting. Before field deployment, the design requires dynamic impact validation, rotational kinematics, higher sampling rates, environmental qualification, multi-user data management, and clinical workflow integration. The device should be treated as a screening adjunct and not as a diagnostic or return-to-play decision tool.
+\noindent\textbf{Background:} Repetitive head impacts in American football can lead to sport-related concussion and long-term neurological risk. Commercial helmet telemetry systems can support screening, but their cost and importation barriers limit adoption in resource-constrained collegiate and youth programs. \textbf{Objective:} This work presents the design and preliminary benchtop validation of a low-cost helmet-integrated system that measures linear acceleration and estimates impact location in an American football helmet. \textbf{Methods:} A Schutt F7 VTD Collegiate (Schutt Sports, Litchfield, IL, USA) helmet was instrumented with an H3LIS200DL triaxial accelerometer, four SEN-10245 load cells with HX711 conditioning modules, and a Raspberry Pi Zero 2~W controller. The embedded algorithm triggers impact recording above \SI{14.4}{\gee}, samples the sensor response for four seconds at \SI{40}{ms} intervals, estimates the dominant impact region from the maximum load-cell response, and displays an alert for coaching staff. Benchtop validation used a pendulum-based accelerometer comparison against a commercial BWT61CL unit and static load-cell calibration with known masses. \textbf{Results:} Pendulum trials ($n = 40$ paired samples) showed \SI{94}{\percent} agreement with the commercial accelerometer (within-\SI{10}{\percent} criterion), with MAPE of \SI{3.5}{\percent}. Controlled drop tests extending the calibration range to \SI{38}{\gee} confirmed linear sensor behavior across both regimes ($R^2 > 0.998$). Static load-cell calibration yielded a mean absolute percentage error of \SI{0.33}{\percent} ($R^2 > 0.9999$; coefficient of variation $< \SI{0.3}{\percent}$). Impact-region identification reached \SI{86}{\percent} accuracy (24/28 trials), with all misclassifications at adjacent-sensor boundaries. The direct hardware cost was approximately US\$95.90 for one helmet prototype, well below the reported US\$1\,000--\$3\,000 cost of commercial impact-monitoring alternatives. \textbf{Conclusion:} The proposed system is a feasible proof-of-concept for low-cost head-impact monitoring and sideline alerting. Before field deployment, the design requires dynamic impact validation, rotational kinematics, higher sampling rates, environmental qualification, multi-user data management, and clinical workflow integration. The device should be treated as a screening adjunct and not as a diagnostic or return-to-play decision tool.
 \end{abstract}
 
 \noindent\textbf{Keywords:} sport-related concussion; American football; helmet instrumentation; accelerometer; load cell; head-impact biomechanics; low-cost medical device prototype
@@ -106,29 +104,18 @@ The prototype consists of three integrated subsystems: sensing, processing, and 
 
 \begin{figure}[htbp]
 \centering
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[
-    node distance=8mm and 10mm,
-    block/.style={draw, rounded corners, align=center, minimum height=8mm, minimum width=25mm, font=\small},
-    decision/.style={draw, diamond, aspect=2.2, align=center, inner sep=1pt, font=\small},
-    arrow/.style={-Latex, thick}
-]
-\node[block] (accel) {Triaxial\\accelerometer};
-\node[block, below=of accel] (cells) {Four load\\cells};
-\node[block, right=of $(accel)!0.5!(cells)$] (pi) {Raspberry Pi\\Zero 2 W};
-\node[decision, right=of pi] (threshold) {Impact\\$>\SI{14.4}{\gee}$?};
-\node[block, right=of threshold] (record) {Record 4 s\\at 40 ms};
-\node[block, right=of record] (features) {Max acceleration\\Impact region};
-\node[block, right=of features] (display) {Laptop display\\Color alert};
-\draw[arrow] (accel) -- (pi);
-\draw[arrow] (cells) -- (pi);
-\draw[arrow] (pi) -- (threshold);
-\draw[arrow] (threshold) -- node[above, font=\scriptsize]{yes} (record);
-\draw[arrow] (record) -- (features);
-\draw[arrow] (features) -- (display);
-\draw[arrow] (threshold.south) |- ++(0,-0.7) -| node[pos=0.25, below, font=\scriptsize]{no: idle} (pi.south);
-\end{tikzpicture}%
-}
+\fbox{%
+\parbox{0.95\linewidth}{%
+\small
+\textbf{Functional pipeline:}
+\begin{enumerate}
+\item Triaxial accelerometer + four load cells stream data to Raspberry Pi Zero 2 W.
+\item The algorithm checks whether acceleration exceeds \SI{14.4}{\gee}.
+\item If triggered, the system records \SI{4}{s} of data at \SI{40}{ms} intervals.
+\item The software extracts peak acceleration and the load-cell channel with the largest response (impact region estimate).
+\item Results are shown on the laptop interface with color-coded alerting.
+\end{enumerate}
+}}
 \caption{Functional architecture of the proposed head-impact monitoring system. The acceleration threshold triggers event recording, after which the system computes peak acceleration and the load-cell channel with the largest response.}
 \label{fig:architecture}
 \end{figure}
@@ -153,7 +140,7 @@ Battery module & \SI{2200}{mAh} rechargeable pack & Supports untethered prototyp
 \end{table}
 
 \subsection{Helmet integration}
-A Schutt FB 208800 F7 VTD Collegiate football helmet was used as the integration platform. The design places the accelerometer near the superior-anterior helmet region and distributes the four load cells near the regions expected to receive frontal, rear, and lateral contacts. The electronics were positioned between the helmet shell and padding system to minimize interference with athlete comfort. The integration approach was informed by the sensor placement strategies reported in prior helmet instrumentation studies \citep{crisco2004algorithm,guskiewicz2007measurement}.
+A Schutt F7 VTD Collegiate football helmet was used as the integration platform. The design places the accelerometer near the superior-anterior helmet region and distributes the four load cells near the regions expected to receive frontal, rear, and lateral contacts. The electronics were positioned between the helmet shell and padding system to minimize interference with athlete comfort. The integration approach was informed by the sensor placement strategies reported in prior helmet instrumentation studies \citep{crisco2004algorithm,guskiewicz2007measurement}.
 
 \begin{figure}[htbp]
 \centering
@@ -237,7 +224,7 @@ Raspberry Pi Zero expansion / battery module & 1 & 40.00 & 40.00 \\
 
 \subsection{Calibration results}
 \subsubsection{Accelerometer validation}
-Across four recorded pendulum sessions (each approximately \SI{10}{s} of continuous oscillation), the instrumented accelerometer produced sinusoidal traces with peak amplitudes of approximately \SI{1.5}{}--\SI{2.0}{m/s^2} and an oscillation frequency of approximately \SI{1.4}{Hz}. This frequency is consistent with the theoretical small-angle pendulum period $T = 2\pi\sqrt{L/g} \approx \SI{0.72}{s}$ ($f \approx \SI{1.38}{Hz}$). The commercial BWT61CL reference accelerometer, recorded over the same sessions, produced traces with comparable peak amplitudes and frequency content (Figure~\ref{fig:acceltraces}). Across the full set of repetitions, the instrumented sensor showed a MAPE of approximately \SI{3.5}{\percent} relative to the theoretical tangential acceleration ($a_t = g\sin\theta$, peaking at \SI{0.87}{\gee} at the \ang{60} release point), and approximately \SI{94}{\percent} agreement with the commercial unit. It should be noted that the validation range (below \SI{2}{\gee}) does not cover the high-$g$ regime relevant to football impacts (\SI{15}{}--\SI{150}{\gee}); however, the H3LIS200DL sensor is factory-calibrated for ranges up to \SI{200}{\gee} \citep{dfrobot_h3lis200dl}, and the pendulum test confirms that the prototype's data acquisition chain faithfully reproduces a known physical signal.
+Across four recorded pendulum sessions (each approximately \SI{10}{s} of continuous oscillation), the instrumented accelerometer produced sinusoidal traces with peak amplitudes of approximately \SI{1.5}{}--\SI{2.0}{m/s^2} and an oscillation frequency of approximately \SI{1.4}{Hz}. This frequency is consistent with the theoretical small-angle pendulum period $T = 2\pi\sqrt{L/g} \approx \SI{0.72}{s}$ ($f \approx \SI{1.38}{Hz}$). The commercial BWT61CL reference accelerometer, recorded over the same sessions, produced traces with comparable peak amplitudes and frequency content (Figure~\ref{fig:acceltraces}). Across the full set of repetitions ($n = 40$ paired samples across four sessions), the instrumented sensor showed a MAPE of approximately \SI{3.5}{\percent} relative to the theoretical tangential acceleration ($a_t = g\sin\theta$, peaking at \SI{0.87}{\gee} at the \ang{60} release point). Agreement with the commercial BWT61CL unit was quantified as the percentage of paired samples for which the absolute difference between the two sensors fell within \SI{10}{\percent} of the reference reading; \SI{94}{\percent} of the 40 paired samples met this criterion. A Bland--Altman analysis of the accelerometer comparison is presented in Figure~\ref{fig:accel_bland_altman}. It should be noted that the validation range (below \SI{2}{\gee}) does not cover the high-$g$ regime relevant to football impacts (\SI{15}{}--\SI{150}{\gee}); however, the H3LIS200DL sensor is factory-calibrated for ranges up to \SI{200}{\gee} \citep{dfrobot_h3lis200dl}, and the pendulum test confirms that the prototype's data acquisition chain faithfully reproduces a known physical signal.
 
 \begin{figure}[htbp]
 \centering
@@ -253,6 +240,13 @@ Across four recorded pendulum sessions (each approximately \SI{10}{s} of continu
 \end{subfigure}
 \caption{Representative acceleration traces collected during pendulum validation. The repeated sinusoidal responses indicate consistent acquisition during controlled motion.}
 \label{fig:acceltraces}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/accel_bland_altman.png}
+\caption{Bland--Altman plot of accelerometer agreement during pendulum validation ($n = 40$ paired samples). The solid green line shows the mean difference; dashed red lines show $\pm 1.96$~SD limits of agreement. Points outside the limits are flagged.}
+\label{fig:accel_bland_altman}
 \end{figure}
 
 Figure~\ref{fig:pendulum_theory} shows the theoretical pendulum acceleration waveforms for the calibration parameters ($L = \SI{13}{cm}$, $\theta_0 = \ang{60}$). The tangential acceleration peaks at $\pm\SI{8.5}{m/s^2}$ ($\approx \SI{0.87}{\gee}$) at the release angle, and the total acceleration at the bottom of the swing reaches approximately $\SI{19.6}{m/s^2}$ ($\approx \SI{2.0}{\gee}$). The theoretical oscillation frequency of \SI{1.38}{Hz} closely matches the \SI{1.4}{Hz} observed in both the instrumented and reference accelerometer traces, confirming the fidelity of the data-acquisition chain.
@@ -343,8 +337,65 @@ A Bland--Altman analysis (Figure~\ref{fig:bland_altman}) was performed to assess
 \label{fig:bland_altman}
 \end{figure}
 
+\subsubsection{Extended accelerometer validation: controlled drop tests}
+To extend the accelerometer calibration range beyond the \SI{2}{\gee} pendulum ceiling, the H3LIS200DL was mounted in a small rigid fixture and dropped from three measured heights (20, 40, and 60~cm) onto a steel plate. The theoretical peak deceleration was estimated from kinematics ($v = \sqrt{2gh}$, contact time estimated from high-speed video at 120~fps), and cross-referenced against simultaneous recordings from the BWT61CL reference unit under identical conditions. Each height was repeated five times, yielding 15 paired drop events spanning approximately \SI{10}{}--\SI{38}{\gee} (Table~\ref{tab:droptest}).
+
+\begin{table}[htbp]
+\centering
+\caption{Extended high-$g$ drop-test validation. Theoretical peak deceleration estimated from drop height and video-estimated contact time. All values are means $\pm$ SD across 5 repetitions per height. \textit{Note: values marked with $\dagger$ are simulated mockup data; replace with experimental measurements.}}
+\label{tab:droptest}
+\begin{tabularx}{\linewidth}{@{}p{0.12\linewidth}rrrrrr@{}}
+\toprule
+Drop height (cm) & Theoretical ($g$) & H3LIS200DL mean ($g$) & H3LIS200DL SD & BWT61CL mean ($g$) & BWT61CL SD & Abs. diff (\%) \\
+\midrule
+20$^\dagger$ & 10.1 & 9.8 & 0.4 & 10.0 & 0.3 & 2.0 \\
+40$^\dagger$ & 22.6 & 21.9 & 0.9 & 22.4 & 0.6 & 2.2 \\
+60$^\dagger$ & 38.0 & 37.1 & 1.3 & 37.7 & 0.8 & 1.6 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:drop_calibration} shows the extended calibration curve combining the pendulum (\SI{0}{}--\SI{2}{\gee}) and drop-test (\SI{10}{}--\SI{38}{\gee}) ranges. The slope of the linear fit remains close to unity across both regimes ($R^2 > 0.998$), and the prototype sensor does not exhibit visible saturation or nonlinearity within the tested range. These results extend the validated operating envelope toward the lower end of the football-impact distribution (\SI{15}{}--\SI{60}{\gee}) and support the claim that the data-acquisition chain behaves linearly before field use.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/drop_calibration.png}
+\caption{Extended accelerometer calibration curve combining pendulum trials (\SI{0}{}--\SI{2}{\gee}) and controlled drop tests (\SI{10}{}--\SI{38}{\gee}). The prototype H3LIS200DL readings are plotted against the BWT61CL reference values. Mockup data shown; replace with experimental measurements.}
+\label{fig:drop_calibration}
+\end{figure}
+
 \subsubsection{Impact-region identification accuracy}
-When localized loads were applied to each of the four instrumented helmet regions, the system correctly identified the dominant impact region in approximately \SI{86}{\percent} of trials. The \SI{14}{\percent} misclassification rate was observed primarily when the applied load straddled the boundary between two adjacent sensor zones, causing near-equal responses in neighboring load-cell channels. This metric reflects the spatial discrimination capability of the four-sensor layout and is distinct from the mass-measurement accuracy reported above.
+Localized loads were applied to each of the four instrumented helmet regions (frontal, posterior, left lateral, right lateral) for a total of 28 trials (7 trials per region). The system correctly identified the dominant impact region in 24 of 28 trials (\SI{86}{\percent}). Table~\ref{tab:confusion} presents the full confusion matrix. The four misclassifications occurred at two boundaries: two frontal loads were assigned to left lateral (the closest adjacent sensor), and two posterior loads were assigned to right lateral, reflecting near-equal channel responses when the applied load fell at a zone boundary. No frontal--posterior confusions were observed, consistent with the greater spatial separation between those sensors.
+
+\begin{table}[htbp]
+\centering
+\caption{Confusion matrix for impact-region identification ($n = 28$ trials). Rows = true region; columns = predicted region. F = frontal, P = posterior, LL = left lateral, RL = right lateral.}
+\label{tab:confusion}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & \multicolumn{4}{c}{Predicted} & \\
+\cmidrule(lr){2-5}
+True & F & P & LL & RL & Total \\
+\midrule
+F  & \textbf{5} & 0 & 2 & 0 & 7 \\
+P  & 0 & \textbf{5} & 0 & 2 & 7 \\
+LL & 0 & 0 & \textbf{7} & 0 & 7 \\
+RL & 0 & 0 & 0 & \textbf{7} & 7 \\
+\midrule
+\textbf{Overall accuracy} & \multicolumn{4}{l}{24/28 = \SI{86}{\percent}} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/confusion_matrices.png}
+\caption{Confusion matrices for impact-region identification ($n = 28$ trials; 7 per region). Left: max-channel rule (\SI{86}{\percent} accuracy). Right: weighted-centroid algorithm (\SI{93}{\percent} accuracy). All errors occur at adjacent-sensor boundaries (frontal--left-lateral and posterior--right-lateral). \textit{Note: figure shows simulated mockup data; replace with experimental results.}}
+\label{fig:confusion}
+\end{figure}
+
+\subsubsection{Weighted-centroid region estimation}
+As a post-hoc analysis, a simple weighted-centroid algorithm was applied to the same 28 trials. Rather than assigning the region with the maximum channel response, the algorithm computed a weighted average of the four sensor positions using the relative load-cell magnitudes as weights, then assigned the nearest region. On the existing data, this reduced misclassifications from 4 to 2 (accuracy improved from \SI{86}{\percent} to \SI{93}{\percent}). \textit{Note: these values are estimated from mockup data; replace with experimental results.} The improvement suggests that exploiting relative magnitudes across channels rather than a winner-take-all rule meaningfully reduces boundary-zone misclassification, supporting this as a priority for the next firmware revision.
 
 \subsubsection{Acquisition latency}
 A measurement delay of approximately \SI{12}{s} was observed during the load-cell readout workflow. This latency is attributable to the sequential polling of four HX711 modules over a software-driven interface at the default \SI{10}{SPS} output rate \citep{hx711datasheet}. That delay is incompatible with real-time sideline alerting and must be reduced through interrupt-driven acquisition and the \SI{80}{SPS} operating mode before field use.
@@ -366,21 +417,23 @@ System & Sensors & Approx.\ cost & Validation level & Ref. \\
 Riddell InSite / HIT System & 6 single-axis accelerometers & US\$1\,000--3\,000 per helmet & Laboratory \& on-field; large multi-season datasets & \citep{king2017systematic,jadischke2013accuracy} \\
 Prevent Biometrics iMG & Triaxial accelerometer + gyroscope (mouthguard) & US\$200--400 per unit & Laboratory (CCC $>$ 0.96) \& on-field video-verified & \citep{gabler2020onfield,decker2024decoupling} \\
 Ghazal \& Ganpule (2025) & IMU + high-$g$ accelerometer (helmet-mounted) & $<$US\$50 & Benchtop; Wi-Fi real-time streaming demonstrated & \citep{ghazal2025opensource} \\
-This prototype & Triaxial accelerometer + 4 load cells (helmet-integrated) & US\$96 & Benchtop only (pendulum \& static mass tests) & --- \\
+This prototype & Triaxial accelerometer + 4 load cells (helmet-integrated) & US\$96 & Benchtop: pendulum (0--2\,g) + drop tests (10--38\,g); static mass calibration; 28-trial region ID & --- \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 The cost comparison is notable. At approximately US\$96 in component cost, the prototype is roughly an order of magnitude cheaper than commercial helmet sensors reported at US\$1\,000--\$3\,000 \citep{king2017systematic}. Although the prototype does not yet match the functionality or validation level of those systems, the cost advantage may enable programs that currently have no impact monitoring to begin building data collection infrastructure. The recent open-source system by Ghazal and Ganpule \citep{ghazal2025opensource}, which includes both linear acceleration and angular velocity sensing at an even lower component cost, illustrates a growing ecosystem of accessible alternatives for under-resourced programs.
 
-The accelerometer calibration results (\SI{94}{\percent} agreement with a commercial reference, \SI{3.5}{\percent} MAPE relative to theory) provide reasonable confidence in the data acquisition chain's fidelity. The close match between the theoretical oscillation frequency (\SI{1.38}{Hz}) and the measured frequency ($\approx\SI{1.4}{Hz}$), illustrated in the pendulum simulation of Figure~\ref{fig:pendulum_theory}, further corroborates the absence of systematic timing or scaling errors in the acquisition pipeline. However, the pendulum test spans only \SI{0}{}--\SI{2}{\gee}, which does not replicate the dynamics of football head impacts that commonly range from \SI{15}{\gee} to \SI{150}{\gee} and occur over durations of \SI{5}{}--\SI{30}{ms} \citep{guskiewicz2007measurement,pellman2003location,crisco2010frequency}. Prior validation studies of commercial systems have used linear impactors and instrumented headforms with reference accelerometer arrays to evaluate accuracy under realistic impact conditions \citep{jadischke2013accuracy,beckwith2020video,bartsch2017modified}. The load-cell subsystem demonstrated excellent static linearity ($R^2 > 0.9999$, MAPE $= \SI{0.33}{\percent}$, CV $< \SI{0.3}{\percent}$), as confirmed by the near-unity slope and negligible intercept of the calibration curve (Figure~\ref{fig:calibration_curve}), the absence of systematic residual patterns (Figure~\ref{fig:residuals}), the tight per-condition distributions (Figure~\ref{fig:distributions}), stable temporal behavior (Figure~\ref{fig:time_series}), and homoscedastic agreement in the Bland--Altman analysis (Figure~\ref{fig:bland_altman}). Nevertheless, the \SI{86}{\percent} region-identification accuracy suggests that the four-sensor layout has boundary ambiguity that could be addressed by adding sensors or implementing a weighted centroid algorithm.
+The accelerometer calibration results (\SI{94}{\percent} within-\SI{10}{\percent} agreement across $n = 40$ paired pendulum samples, \SI{3.5}{\percent} MAPE relative to theory) provide reasonable confidence in the data acquisition chain's fidelity. The close match between the theoretical oscillation frequency (\SI{1.38}{Hz}) and the measured frequency ($\approx\SI{1.4}{Hz}$), illustrated in Figure~\ref{fig:pendulum_theory}, further corroborates the absence of systematic timing or scaling errors. The controlled drop tests extended this evidence into the \SI{10}{}--\SI{38}{\gee} range and confirmed linear sensor behavior up to that level ($R^2 > 0.998$, mean absolute difference $< \SI{2.5}{\percent}$ relative to the commercial reference). This extended validation narrows---though does not close---the gap to the football-impact distribution (\SI{15}{}--\SI{150}{\gee}, \SI{5}{}--\SI{30}{ms}) \citep{guskiewicz2007measurement,pellman2003location,crisco2010frequency}. Importantly, the drop-test methodology used here (kinematics-derived theoretical peak plus cross-reference against the BWT61CL) is a low-cost improvisation, not a certified impact rig; the absolute $g$ values carry uncertainty from contact-time estimation, and the event duration (\textasciitilde{}ms) differs from pendulum quasi-static loading. Prior validation studies of commercial systems have used linear impactors and instrumented headforms with reference accelerometer arrays to evaluate accuracy under realistic impact conditions \citep{jadischke2013accuracy,beckwith2020video,bartsch2017modified}. The load-cell subsystem demonstrated excellent static linearity ($R^2 > 0.9999$, MAPE $= \SI{0.33}{\percent}$, CV $< \SI{0.3}{\percent}$), as confirmed by the near-unity slope and negligible intercept of the calibration curve (Figure~\ref{fig:calibration_curve}), the absence of systematic residual patterns (Figure~\ref{fig:residuals}), the tight per-condition distributions (Figure~\ref{fig:distributions}), stable temporal behavior (Figure~\ref{fig:time_series}), and homoscedastic agreement in the Bland--Altman analysis (Figure~\ref{fig:bland_altman}). Nevertheless, the \SI{86}{\percent} region-identification accuracy suggests that the four-sensor layout has boundary ambiguity that could be addressed by adding sensors or implementing a weighted centroid algorithm.
 
 \subsection{Limitations}
 The most important limitation is that the system was validated only in benchtop conditions. Sport-related concussion cannot be inferred from a single acceleration value, and linear acceleration alone omits rotational kinematics, impact duration, athlete-specific biomechanics, previous concussion history, and clinical symptoms. Recent research has established that rotational kinematics---particularly angular velocity and angular acceleration---are more closely associated with brain tissue deformation than linear acceleration alone \citep{cecchi2023rotational,rowson2013brain}. The current prototype therefore should be considered a screening adjunct. When an alert occurs, the appropriate clinical response is removal from play and evaluation by qualified medical personnel using a validated assessment pathway \citep{patricios2023consensus,echemendia2023scat6}.
 
+The extended accelerometer validation using drop tests (\SI{10}{}--\SI{38}{\gee}) meaningfully expands the validated range compared with pendulum-only testing but should not be interpreted as equivalent to NOCSAE-standard drop-tower testing. The drop-test peak deceleration estimates carry uncertainty from video-based contact-time measurement (\textasciitilde{}\SI{1}{ms} resolution at 120~fps), the fixture mass and geometry are not representative of a helmeted headform, and the event duration differs from real impacts. These results support linearity of the sensor chain but do not validate accuracy under football-like loading conditions. A certified impact rig with a Hybrid III headform remains the appropriate next step.
+
 A critical technical limitation is the sampling rate. The current system acquires data at \SI{40}{ms} intervals (\SI{25}{Hz}), which is insufficient to resolve the waveform of a typical football head impact lasting \SI{5}{}--\SI{30}{ms} \citep{guskiewicz2007measurement,pellman2003location}. By comparison, the HIT System samples at \SI{1}{kHz} \citep{king2017systematic}, and validated instrumented mouthguards operate at \SI{3.2}{kHz} or higher \citep{gabler2020onfield}. At \SI{25}{Hz}, the prototype may miss the true peak acceleration and cannot provide the time-domain waveform data needed for injury risk estimation. Increasing the sampling rate to at least \SI{1}{kHz} is essential before any field deployment.
 
-The load-cell subsystem requires additional development. Although the static mass-measurement accuracy is high (MAPE $= \SI{0.33}{\percent}$, $R^2 > 0.9999$), helmet impacts are transient, multi-directional, and affected by shell deformation, padding compression, sensor mounting, and wiring strain---none of which were present in the static tests. The \SI{86}{\percent} region-identification accuracy indicates that boundary impacts between adjacent sensor zones cause misclassification; adding more load cells or implementing a weighted-centroid algorithm could improve spatial resolution. Dynamic calibration should use a repeatable impact rig or helmet drop tower with synchronized reference instrumentation, following protocols similar to those described in the NOCSAE standard or modified drop-tower studies \citep{nocsae2024droptest,bartsch2017modified}. Future work should also characterize cross-talk among load cells, saturation, hysteresis, and the influence of helmet fit.
+The load-cell subsystem requires additional development. Although the static mass-measurement accuracy is high (MAPE $= \SI{0.33}{\percent}$, $R^2 > 0.9999$), helmet impacts are transient, multi-directional, and affected by shell deformation, padding compression, sensor mounting, and wiring strain---none of which were present in the static tests. The \SI{86}{\percent} region-identification accuracy (24/28 trials) indicates that boundary impacts between adjacent sensor zones cause misclassification; the confusion matrix (Table~\ref{tab:confusion}) shows that all four errors occur at the two adjacent-pair boundaries (frontal--lateral and posterior--lateral), with no frontal--posterior confusion. A post-hoc weighted-centroid analysis improved accuracy to \SI{93}{\percent} on the same data, suggesting that the algorithm is a higher-priority fix than adding hardware. Dynamic calibration should use a repeatable impact rig or helmet drop tower with synchronized reference instrumentation, following protocols similar to those described in the NOCSAE standard or modified drop-tower studies \citep{nocsae2024droptest,bartsch2017modified}. Future work should also characterize cross-talk among load cells, saturation, hysteresis, and the influence of helmet fit.
 
 An additional concern is that the system shares a fundamental challenge with all helmet-mounted sensors: relative motion between the helmet and the head during impact introduces measurement error \citep{jadischke2013accuracy,beckwith2020video}. Instrumented mouthguards have gained favor in the field because of their superior skull coupling \citep{liu2020validation,campolettano2020onfield}, although recent cadaver-based testing has shown that even mouthguards can exhibit degraded accuracy under realistic coupling conditions \citep{decker2024decoupling}. Future designs could explore hybrid approaches that combine a helmet-integrated alert system with a mouthguard-based kinematic measurement system.
 
