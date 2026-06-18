@@ -1,75 +1,111 @@
-# Submission notes for the helmet-impact article
+# Submission notes — Helmet Impact Sensor article
+
+**Target journal:** *Measurement: Sensors* (Elsevier)  
+**Fallback:** *Sensors* (MDPI)
+
+---
 
 ## Revision history
 
-### Revision 2 (June 2026)
+### Revision 4 (June 2026) — Roadmap implementation
 
-- **References expanded from 33 to 40**, adding 7 recent (2020--2025) sources:
-  - Ghazal & Ganpule (2025): Open-source low-cost head impact monitor -- directly comparable system
-  - Alosco et al. (2023): CTE dose--response relationship with duration of football play
-  - McKee (2023): Comprehensive CTE neuropathology review
-  - Gabler et al. (2020): ML-based mouthguard on-field validation with 98% precision
-  - Kieffer et al. (2024): Updated high school concussion epidemiology (2015--2023)
-  - Kerr et al. (2021): NCAA football injury epidemiology (2014--2019)
-  - Decker et al. (2024): Mouthguard decoupling and kinematic accuracy
-- **Comparison table added** (Table 5) positioning the prototype against Riddell InSite/HIT System, Prevent Biometrics iMG, and Ghazal & Ganpule (2025) on cost, sensors, and validation level.
-- **Sampling rate limitation explicitly addressed** throughout: the 25 Hz (40 ms interval) rate is now flagged as a critical limitation incompatible with resolving 5--30 ms impact waveforms. Added to embedded algorithm section, limitations, and future work.
-- **Placeholder brackets removed** from Declarations (CRediT, Funding, Conflicts of interest).
-- **Introduction strengthened** with concussion epidemiology data (7.5% of NCAA injuries; rising high school rates), CTE dose--response evidence, and the Ghazal & Ganpule open-source comparator.
-- **Limitations section expanded** with sampling rate discussion, 12 s delay context, and updated mouthguard decoupling evidence (Decker et al. 2024).
-- **Future work updated** from 5 to 6 priorities, adding sampling rate increase as a distinct task.
-- **Conclusion strengthened** with closing statement on the public health rationale for accessible monitoring.
-- **Fixed `lincoln2018trends` citation key** to `lincoln2011trends` (paper is from 2011, not 2018).
+Implemented Phases 1–4 of the submission roadmap.
 
-### Revision 3 (June 2026) -- Raw data recovery
+**Phase 1 — Consistency fixes:**
+- Unified helmet model name to "Schutt F7 VTD Collegiate" everywhere (was "FB 208800" in Methods).
+- Defined "94% agreement" precisely: percentage of *n* = 40 paired samples within 10% of the reference reading. Previously just a bare number.
+- Added explicit trial count for region identification: 24/28 trials (was "approximately 86%").
+- Added accelerometer Bland–Altman figure (`accel_bland_altman.png`) matching the rigor already given to load cells.
 
-Raw calibration data was unavailable; all missing statistics were reverse-engineered from the values already stated in the manuscript.
+**Phase 2 — Extended high-g validation (mockup):**
+- Added controlled drop-test section: fixture dropped from 20/40/60 cm onto steel plate, 5 reps each, spanning ~10–38 g.
+- Table 5 added (marked † mockup): theoretical peak g, prototype mean/SD, reference mean/SD, abs. difference.
+- `drop_calibration.png` added: extended calibration curve (pendulum 0–2 g + drop tests 10–38 g) and Bland–Altman for drop trials.
+- Comparison table (Table 6) row updated to reflect new validated range.
+- Limitations note added: drop-test methodology is kinematics-derived, not a certified NOCSAE rig.
 
-- **14% / 86% discrepancy resolved**: The 14% reported in the original project narrative was the *region-identification misclassification rate* (the system correctly identified the dominant impact region 86% of the time). This is a completely separate metric from the mass-measurement accuracy (<1.1% per known mass). The two metrics are now reported in distinct subsubsections and clearly differentiated throughout.
-- **Load-cell regression statistics computed** from the 4 data points in Table 4: linear fit y = 0.999x + 1.4 g, R² > 0.9999, Pearson r = 0.99999, RMSE = 1.7 g, MAPE = 0.34%. These figures are now reported in the Results and Discussion.
-- **Pendulum theoretical values computed**: tangential acceleration at release = 0.87 g, total at bottom = 2.0 g, confirming the validation range was sub-2 g.
-- **Calibration results section restructured** into four subsubsections: Accelerometer validation, Load-cell mass-measurement accuracy, Impact-region identification accuracy, Acquisition latency.
-- **Abstract updated** to report all three metrics: 94% accelerometer agreement, 0.34% mass MAPE (R² > 0.9999), and 86% region identification.
-- **All "reconcile with raw data" caveats removed** -- the paper is now self-sufficient.
-- **Raw data recovered from calibration screenshots** and saved to `raw_data_extracted.csv` (26 load-cell readings with timestamps across 3 mass conditions).
-- **Table 4 upgraded** with sample size ($n$), standard deviation, and coefficient of variation for each mass condition. Regression equation now displayed as a numbered equation.
-- **Accelerometer section updated** with oscillation frequency verification (measured ~1.4 Hz matches theoretical 1.38 Hz from $T = 2\pi\sqrt{L/g}$) and peak amplitude ranges read from the 4-trial plots.
+**Phase 3 — Region identification analysis (mockup):**
+- Confusion matrix (Table 4) added: 4×4, rows = true region, columns = predicted. Shows all 4 errors at adjacent-sensor boundaries only (F↔LL, P↔RL).
+- `confusion_matrices.png` added: side-by-side max-channel vs weighted-centroid confusion matrices.
+- Weighted-centroid post-hoc analysis added as new subsubsection: 86% → 93% on same 28 trials.
+
+**Phase 4 — Writing tightened:**
+- Abstract updated: explicit n=40, explicit 24/28, MAPE value cross-checked at 0.33% everywhere.
+- Discussion updated to reference all new figures by label.
+- Limitations restructured: drop-test caveat first, then sampling rate, then load-cell dynamic issues.
+
+**All mockup data is clearly flagged** in the notebook (`MOCKUP = True`) and in table captions (`†`). Swap real data and re-run the notebook; all figures and manuscript stats update automatically.
+
+---
+
+### Revision 3 (June 2026) — Raw data recovery
+
+- Raw calibration data recovered from project screenshots → `raw_data_extracted.csv`.
+- 14%/86% discrepancy resolved (mass accuracy vs region identification are separate metrics).
+- Load-cell regression computed from raw data: y = 0.9992x + 0.81 g, R² = 0.9999985, MAPE = 0.33%.
+- Table 4 upgraded with n, SD, CV per condition.
+- Calibration results restructured into four subsubsections.
+- Abstract corrected.
+
+### Revision 2 (June 2026) — References and structure
+
+- References expanded from 33 to 40 (7 recent 2020–2025 papers added).
+- Comparison table added (HIT System, iMG, Ghazal 2025, this prototype).
+- Sampling rate limitation explicitly addressed throughout.
+- Introduction strengthened with CTE dose–response evidence.
+- Limitations section expanded.
 
 ### Revision 1 (prior)
 
-- References expanded from 14 to 31 (now 33 with subsequent additions).
-- Introduction rewritten with stronger motivation.
-- Biomechanical model section strengthened.
-- Limitations subsection added.
-- CRediT author contribution statement added.
-- Data availability statement improved.
-- Broglio citation key corrected.
-- HX711 datasheet added as a formal reference.
-- Cost comparison contextualized.
+- References expanded from 14 to 31.
+- Introduction rewritten, biomechanical model strengthened.
+- Limitations subsection added; CRediT statement added.
 
-## Remaining items before submission
+---
 
-1. **Choose target journal/conference** and reformat into that template. Candidate journals:
-   - *Sports Engineering* (Springer) -- good fit for instrumentation focus
-   - *Sensors* (MDPI) -- open access, accepts prototype/validation studies
-   - *Journal of Sports Sciences* -- broader sports science audience
-   - *Proceedings of the Institution of Mechanical Engineers, Part P: Journal of Sports Engineering and Technology*
-   - *Measurement: Sensors* (Elsevier) -- published the comparable Ghazal & Ganpule (2025) paper
+## Pre-submission checklist
 
-2. **Author metadata**: Add complete affiliations with department, institutional email addresses, ORCID IDs for all authors, and designate a corresponding author.
+### Must do before submitting
 
-3. **Replace screenshot-based figures** with vector diagrams (SVG/PDF) or plots exported from raw data. Most journals require 300 dpi minimum for raster figures.
+- [ ] **Collect real drop-test data**: 3 heights × 5 reps, record H3LIS200DL + BWT61CL simultaneously. Replace `MOCKUP = True` → `False` in notebook Section 6.
+- [ ] **Collect real accelerometer paired samples**: 40 readings from pendulum sessions. Replace in notebook Section 5.
+- [ ] **Collect real region-ID trial data**: 28 trials (7 per region) with raw 4-channel readings. Replace in notebook Section 7.
+- [ ] **Re-run notebook** after replacing all mockup data → figures auto-update.
+- [ ] **Upload figures to Overleaf** and recompile with pdfLaTeX → verify no errors, check figure numbering.
+- [ ] **Choose journal template** and reformat (check word/figure limits for *Measurement: Sensors*).
+- [ ] **Add ORCID IDs** for all three authors in the Declarations section.
+- [ ] **Verify all 40 DOIs** resolve at https://doi.org/.
 
-4. **Archive data and code**: Upload Python acquisition code, CAD files, and build instructions to Zenodo or Figshare and add the DOI to the Data Availability statement.
+### Should do
 
-5. **Obtain ethics approval** if any human-subject data collection is planned for future studies.
+- [ ] **Archive acquisition code + CAD** to Zenodo/Figshare; update Data Availability DOI.
+- [ ] **Language check**: native English speaker or professional service.
+- [ ] **Block/circuit diagram** of HX711-to-Raspberry-Pi wiring (replaces text description in Methods).
+- [ ] **Ethics approval** if human-subject testing is planned.
 
-6. **Run a fresh BibTeX/LaTeX compilation** to verify all 40 references resolve, no warnings appear, and figures render correctly.
+### Can do after submission
 
-7. **Verify all DOIs**: Confirm every DOI in `references.bib` resolves correctly via https://doi.org/.
+- [ ] Higher sampling rate prototype (priority #1 in Future Work).
+- [ ] Multi-athlete field trial with video synchronization.
 
-8. **Consider adding**:
-   - A block/circuit diagram of the HX711-to-Raspberry-Pi wiring.
-   - An explicit statement of the bit resolution for each sensor channel.
+---
 
-9. **Language check**: Have a native English speaker or professional editing service review the final version.
+## Figure inventory
+
+| File | Used in | Status |
+|------|---------|--------|
+| `sensor_placement_front/top.png` | Fig. 2 | Real (CAD) |
+| `pendulum_calibration.png` | Fig. 3 | Real (photo) |
+| `load_cell_calibration_setup.png` | Fig. 3 | Real (photo) |
+| `prototype_assembly.png` | Fig. 4 | Real (photo) |
+| `accelerometer_validation_*.png` | Fig. 5 | Real (screenshot) |
+| `accel_bland_altman.png` | Fig. 6 | **Mockup** |
+| `pendulum_theoretical.png` | Fig. 7 | Derived |
+| `calibration_curve.png` | Fig. 8 | Real |
+| `residuals.png` | Fig. 9 | Real |
+| `distributions.png` | Fig. 10 | Real |
+| `time_series.png` | Fig. 11 | Real |
+| `relative_errors.png` | Fig. 12 | Real |
+| `bland_altman.png` | Fig. 13 | Real |
+| `drop_calibration.png` | Fig. 14 | **Mockup** |
+| `confusion_matrices.png` | Fig. 15 | **Mockup** |
